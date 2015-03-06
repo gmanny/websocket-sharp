@@ -12,3 +12,6 @@ obj
 *.user
 *.userprefs
 UpgradeLog*.*
+# NCrunch
+*.ncrunch*
+.*crunch*.local.xml
