@@ -1425,14 +1425,23 @@ namespace WebSocketSharp
             if (!frame.IsData)
               return;
 
-            lock (_forEvent) {
+            if (Monitor.TryEnter(_forEvent))
+            {
               try {
-                var e = dequeueFromMessageEventQueue ();
-                if (e != null && _readyState == WebSocketState.Open)
-                  OnMessage.Emit (this, e);
+                while (true)
+                {
+                    var e = dequeueFromMessageEventQueue();
+                    if (e == null || _readyState != WebSocketState.Open)
+                      break;
+                    else
+                      OnMessage.Emit(this, e);
+                }
               }
               catch (Exception ex) {
                 processException (ex, "An exception has occurred during an OnMessage event.");
+              }
+              finally {
+                Monitor.Exit(_forEvent);
               }
             }
           }
