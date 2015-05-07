@@ -563,7 +563,7 @@ Extended Payload Length: {7}
         header => {
           if (header.Length != 2)
             throw new WebSocketException (
-              "The header part of a frame cannot be read from the data source.");
+              String.Format("The header part of a frame cannot be read from the data source. Got {0}/{1} bytes.", header.Length, 2));
 
           var frame = read (header, stream, unmask);
           if (completed != null)
