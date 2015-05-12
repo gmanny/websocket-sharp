@@ -554,6 +554,11 @@ namespace WebSocketSharp
     /// </summary>
     public event EventHandler OnOpen;
 
+    /// <summary>
+    /// Occurs when the <see cref="WebSocket"/> receives a Pong reply from server.
+    /// </summary>
+    public event EventHandler OnPong;
+
     #endregion
 
     #region Private Methods
@@ -1028,6 +1033,8 @@ namespace WebSocketSharp
     {
       _receivePong.Set ();
       _logger.Trace ("Received a Pong.");
+
+      OnPong.Emit(this, EventArgs.Empty);
 
       return true;
     }
@@ -2012,6 +2019,30 @@ namespace WebSocketSharp
                   : WebSocketFrame.EmptyUnmaskPingBytes;
 
       return Ping (bytes, _waitTime);
+    }
+
+    /// <summary>
+    /// Sends a Ping using the WebSocket connection without waiting for the reply.
+    /// </summary>
+    /// <returns>
+    /// <c>true</c> if the <see cref="WebSocket"/> successfully sent the Ping packet;
+    /// otherwise, <c>false</c>.
+    /// </returns>
+    public bool PingAsync()
+    {
+      byte[] bytes = _client
+                     ? WebSocketFrame.CreatePingFrame(true).ToByteArray()
+                     : WebSocketFrame.EmptyUnmaskPingBytes;
+
+      try
+      {
+        return _readyState == WebSocketState.Open && send(bytes);
+      }
+      catch (Exception ex)
+      {
+        _logger.Fatal(ex.ToString());
+        return false;
+      }
     }
 
     /// <summary>
