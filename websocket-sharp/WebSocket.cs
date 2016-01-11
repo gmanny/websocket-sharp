@@ -2344,8 +2344,8 @@ namespace WebSocketSharp
     public bool PingAsync()
     {
       byte[] bytes = _client
-                     ? WebSocketFrame.CreatePingFrame(true).ToByteArray()
-                     : WebSocketFrame.EmptyUnmaskPingBytes;
+                     ? WebSocketFrame.CreatePingFrame(true).ToArray()
+                     : WebSocketFrame.EmptyPingBytes;
 
       try
       {
